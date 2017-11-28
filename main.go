@@ -24,8 +24,8 @@ func main() {
 				if extension == filepath.Ext(path) {
 					file, err := FTime(path)
 					if err == nil {
-						//fmt.Println( "Cr Time", file.CTime)
 						fmt.Println(path, "Mo Time", file.MTime)
+						//fmt.Println( "Cr Time", file.CTime)
 						//fmt.Println("Ac Time", file.ATime)
 					}
 				}
