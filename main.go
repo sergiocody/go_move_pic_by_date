@@ -1,29 +1,51 @@
 package main
 import (
-	"log"
 	"os"
 	"path/filepath"
+	"fmt"
+	"syscall"
+	"time"
 )
 
+type FileTime struct {
+	MTime time.Time
+	CTime time.Time
+	ATime time.Time
+}
 
 
 func main() {
-	var dirPath string = "/Users/codonser/Documents/PERSONAL/fotos/sergio"
+	var dirPath string = "/Users/codonser/Documents/PERSONAL/fotos/mapi"
 	// walk all files in directory
-	extensions := []string{".mp4", ".jpeg",".png"}
+	extensions := []string{".mp4", ".jpeg",".avi"}
 	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			for _, extension := range extensions {
-				log.Println(filepath.Ext(path))
 				if extension == filepath.Ext(path) {
-					log.Println(dirPath, " matches ", extension)
-					return nil
-				}	else {
-
-					log.Println("NO")
+					file, err := FTime(path)
+					if err == nil {
+						//fmt.Println( "Cr Time", file.CTime)
+						fmt.Println(path, "Mo Time", file.MTime)
+						//fmt.Println("Ac Time", file.ATime)
+					}
 				}
 			}
 		}
 		return nil
 	})
+}
+
+
+// Gets the Modified, Create and Access time of a file
+func FTime(file string) (t *FileTime, err error) {
+	fileinfo, err := os.Stat(file)
+	if err != nil {
+		return
+	}
+	t = new(FileTime)
+	var stat = fileinfo.Sys().(*syscall.Stat_t)
+	t.ATime = time.Unix(stat.Atimespec.Sec, stat.Atimespec.Nsec)
+	t.CTime = time.Unix(stat.Ctimespec.Sec, stat.Ctimespec.Nsec)
+	t.MTime = time.Unix(stat.Mtimespec.Sec, stat.Mtimespec.Nsec)
+	return
 }
