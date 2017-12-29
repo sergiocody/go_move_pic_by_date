@@ -39,12 +39,12 @@ func main() {
 						fmt.Println("Month : ", int(month))
 						fmt.Println("Day : ", day)
 
+						fmt.Println("DEST PATH:" + destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)))
 						if _, err := os.Stat(destPath + "/" + strconv.Itoa(year)); os.IsNotExist(err) {
-							os.Mkdir(destPath+"/"+strconv.Itoa(year), 0700)
-							if _, err := os.Stat(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month))); os.IsNotExist(err) {
-								os.Mkdir(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)), 0700)
-								fmt.Println("DEST PATH:" + destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)))
-							}
+							os.Mkdir(destPath+"/"+strconv.Itoa(year), 0700)							
+						}
+						if _, err := os.Stat(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month))); os.IsNotExist(err) {
+							os.Mkdir(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)), 0700)							
 						}
 						//fmt.Println( "Cr Time", file.CTime)
 						//fmt.Println("Ac Time", file.ATime)
