@@ -93,7 +93,6 @@ func main() {
 							//TODO: Check size...
 							fmt.Println("*FILE ALREADY EXISTS : ",path )
 						}
-
 					}
 				}
 			}
