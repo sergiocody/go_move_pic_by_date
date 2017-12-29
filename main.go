@@ -1,8 +1,10 @@
 package main
+
 import (
+	"fmt"
 	"os"
 	"path/filepath"
-	"fmt"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -18,7 +20,7 @@ func main() {
 	var destPath = "/Users/codonser/Documents/PERSONAL/fotos/test/2"
 
 	// walk all files in directory
-	extensions := []string{".mp4", ".jpeg",".avi"}
+	extensions := []string{".mp4", ".jpeg", ".avi"}
 	filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			for _, extension := range extensions {
@@ -37,16 +39,14 @@ func main() {
 						fmt.Println("Month : ", int(month))
 						fmt.Println("Day : ", day)
 
-						if _, err := os.Stat(destPath+"/"+string(year)); os.IsNotExist(err) {
-							os.Mkdir(destPath+"/"+string(year), 0700)
+						if _, err := os.Stat(destPath + "/" + string(year)); os.IsNotExist(err) {
+							fmt.Println("DEST PATH:" + destPath+"/"+strconv.Itoa(year))
+							os.Mkdir(destPath+"/"+strconv.Itoa(year), 0700)
 						}
 						//fmt.Println( "Cr Time", file.CTime)
 						//fmt.Println("Ac Time", file.ATime)
 
 						//NOW MOVING TO THE NEW PATH
-
-
-
 
 					}
 				}
@@ -55,7 +55,6 @@ func main() {
 		return nil
 	})
 }
-
 
 // Gets the Modified, Create and Access time of a file
 func FTime(file string) (t *FileTime, err error) {
@@ -74,7 +73,11 @@ func FTime(file string) (t *FileTime, err error) {
 // exists returns whether the given file or directory exists or not
 func exists(path string) (bool, error) {
 	_, err := os.Stat(path)
-	if err == nil { return true, nil }
-	if os.IsNotExist(err) { return false, nil }
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
 	return true, err
 }
