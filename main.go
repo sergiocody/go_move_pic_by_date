@@ -7,16 +7,19 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+	"io"
+	"log"
 )
 
 type FileTime struct {
+	//Filetime
 	MTime time.Time
 	CTime time.Time
 	ATime time.Time
 }
 
 func main() {
-	var dirPath string = "/Users/codonser/Documents/PERSONAL/fotos/test"
+	var dirPath  = "/Users/codonser/Documents/PERSONAL/fotos/test"
 	var destPath = "/Users/codonser/Documents/PERSONAL/fotos/test/2"
 
 	// walk all files in directory
@@ -35,21 +38,61 @@ func main() {
 						var mtime time.Time
 						mtime = fi.ModTime()
 						year, month, day := mtime.Date()
+						fmt.Println("*FILE : ",path)
 						fmt.Println("Year : ", year)
 						fmt.Println("Month : ", int(month))
 						fmt.Println("Day : ", day)
 
-						fmt.Println("DEST PATH:" + destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)))
+						// FOLDERS: If they doesn't exist : CREATE 
+						//fmt.Println("DEST PATH:" + destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)))
 						if _, err := os.Stat(destPath + "/" + strconv.Itoa(year)); os.IsNotExist(err) {
 							os.Mkdir(destPath+"/"+strconv.Itoa(year), 0700)							
 						}
 						if _, err := os.Stat(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month))); os.IsNotExist(err) {
 							os.Mkdir(destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)), 0700)							
 						}
-						//fmt.Println( "Cr Time", file.CTime)
-						//fmt.Println("Ac Time", file.ATime)
 
-						//NOW MOVING TO THE NEW PATH
+
+						var currentFile= destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month))+ "/"+info.Name()
+						// FILE : Does it exists????
+						if _, err := os.Stat(currentFile); os.IsNotExist(err) {
+							//It should be moved	
+							fmt.Println("Will be MOVED ", path, currentFile)
+
+							from, err := os.Open(path)
+							if err != nil {
+							  log.Fatal(err)
+							  return nil
+							}
+							defer from.Close()
+						  
+							to, err := os.OpenFile(currentFile, os.O_RDWR|os.O_CREATE, 0666)
+							if err != nil {
+							  log.Fatal(err)
+							  return nil
+							}
+							defer to.Close()
+						  
+							_, err = io.Copy(to, from)
+							if err != nil {
+							  log.Fatal(err)
+							  return nil
+							}
+							
+							//NOW WE DELETE THE ORIGINAL FILE
+							// delete file
+							err = os.Remove(path)
+							if err != nil {
+								return nil
+							}
+							fmt.Println("==> done deleting file")
+
+
+						} else{
+							//here the file exist... is the same??
+							//TODO: Check size...
+							fmt.Println("*FILE ALREADY EXISTS : ",path )
+						}
 
 					}
 				}
@@ -73,14 +116,4 @@ func FTime(file string) (t *FileTime, err error) {
 	return
 }
 
-// exists returns whether the given file or directory exists or not
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
-}
+
