@@ -9,6 +9,7 @@ import (
 	"time"
 	"io"
 	"log"
+	//"flag"
 )
 
 type FileTime struct {
@@ -19,8 +20,26 @@ type FileTime struct {
 }
 
 func main() {
-	var dirPath  = "/Users/codonser/Documents/PERSONAL/fotos/test"
-	var destPath = "/Users/codonser/Documents/PERSONAL/fotos/test/2"
+	
+	if (len(os.Args)<3)	{
+		fmt.Println("ERROR: usage main.go dirFROM dirTO" )
+		return
+	}
+	var dirPath  = os.Args[1]//"/Users/codonser/Documents/PERSONAL/fotos/test"
+	var destPath = os.Args[2]//"/Users/codonser/Documents/PERSONAL/fotos/test/2"
+	fmt.Println("----- FROM : ",dirPath )
+	fmt.Println("----- TO :" ,destPath )
+
+	//CHECK PARAMETERS
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		fmt.Println("ERROR, Not a DIR: " ,dirPath )
+		return 					
+	}
+	if _, err := os.Stat(destPath); os.IsNotExist(err) {
+		fmt.Println("ERROR, Not a DIR: " ,destPath )
+		return					
+	}
+	//return 
 
 	// walk all files in directory
 	extensions := []string{".mp4", ".jpeg", ".avi"}
