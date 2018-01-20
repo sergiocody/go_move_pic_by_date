@@ -9,7 +9,7 @@ import (
 	"time"
 	"io"
 	"log"
-	//"flag"
+	"flag"
 )
 
 type FileTime struct {
@@ -20,23 +20,32 @@ type FileTime struct {
 }
 
 func main() {
+	//go run main.go -testmode "/fotos/test/2" "/fotos/test"
+	boolFlag := flag.Bool("testmode", false, "testmode")
+	flag.Parse()
+	if *boolFlag == true {
+		println("TRUE")
+	} else{
+		println("FALSE")
+	}
+
 	
 	if (len(os.Args)<3)	{
 		fmt.Println("ERROR: usage main.go dirFROM dirTO" )
 		return
 	}
-	var dirPath  = os.Args[1]//"/Users/codonser/Documents/PERSONAL/fotos/test"
-	var destPath = os.Args[2]//"/Users/codonser/Documents/PERSONAL/fotos/test/2"
+	var dirPath  = os.Args[2]//"/Users/codonser/Documents/PERSONAL/fotos/test"
+	var destPath = os.Args[3]//"/Users/codonser/Documents/PERSONAL/fotos/test/2"
 	fmt.Println("----- FROM : ",dirPath )
 	fmt.Println("----- TO :" ,destPath )
 
 	//CHECK PARAMETERS
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		fmt.Println("ERROR, Not a DIR: " ,dirPath )
+		fmt.Println("ERROR, SOURCE DIR is Not a DIR: " ,dirPath )
 		return 					
 	}
 	if _, err := os.Stat(destPath); os.IsNotExist(err) {
-		fmt.Println("ERROR, Not a DIR: " ,destPath )
+		fmt.Println("ERROR, DEST DIR is Not a DIR: " ,destPath )
 		return					
 	}
 	//return 
@@ -58,9 +67,8 @@ func main() {
 						mtime = fi.ModTime()
 						year, month, day := mtime.Date()
 						fmt.Println("*FILE : ",path)
-						fmt.Println("Year : ", year)
-						fmt.Println("Month : ", int(month))
-						fmt.Println("Day : ", day)
+						fmt.Println("Year:", year , " | Month:" , int(month) , " | Day:", day)
+						
 
 						// FOLDERS: If they doesn't exist : CREATE 
 						//fmt.Println("DEST PATH:" + destPath + "/" + strconv.Itoa(year)+ "/" + strconv.Itoa(int(month)))
@@ -78,34 +86,35 @@ func main() {
 							//It should be moved	
 							fmt.Println("Will be MOVED ", path, currentFile)
 
-							from, err := os.Open(path)
-							if err != nil {
-							  log.Fatal(err)
-							  return nil
-							}
-							defer from.Close()
-						  
-							to, err := os.OpenFile(currentFile, os.O_RDWR|os.O_CREATE, 0666)
-							if err != nil {
-							  log.Fatal(err)
-							  return nil
-							}
-							defer to.Close()
-						  
-							_, err = io.Copy(to, from)
-							if err != nil {
-							  log.Fatal(err)
-							  return nil
-							}
-							
-							//NOW WE DELETE THE ORIGINAL FILE
-							// delete file
-							err = os.Remove(path)
-							if err != nil {
+							if *boolFlag == false {
+								from, err := os.Open(path)
+								if err != nil {
+								log.Fatal(err)
 								return nil
+								}
+								defer from.Close()
+							
+								to, err := os.OpenFile(currentFile, os.O_RDWR|os.O_CREATE, 0666)
+								if err != nil {
+								log.Fatal(err)
+								return nil
+								}
+								defer to.Close()
+							
+								_, err = io.Copy(to, from)
+								if err != nil {
+								log.Fatal(err)
+								return nil
+								}
+								
+								//NOW WE DELETE THE ORIGINAL FILE
+								// delete file
+								err = os.Remove(path)
+								if err != nil {
+									return nil
+								}
+								fmt.Println("==> done deleting file")
 							}
-							fmt.Println("==> done deleting file")
-
 
 						} else{
 							//here the file exist... is the same??
