@@ -28,16 +28,25 @@ func main() {
 	} else{
 		println("FALSE")
 	}
+	if *boolFlag == true {
+		fmt.Println("TESTMODE" )
+	}	
 
 	
-	if (len(os.Args)<3)	{
+	if flag.NArg()<2	{
+		
 		fmt.Println("ERROR: usage main.go dirFROM dirTO" )
+		fmt.Println(flag.NArg())
 		return
 	}
-	var dirPath  = os.Args[2]//"/Users/codonser/Documents/PERSONAL/fotos/test"
-	var destPath = os.Args[3]//"/Users/codonser/Documents/PERSONAL/fotos/test/2"
+	var dirPath  = flag.Arg(0)//"/Users/codonser/Documents/PERSONAL/fotos/test"
+	var destPath = flag.Arg(1)//"/Users/codonser/Documents/PERSONAL/fotos/test/2"
 	fmt.Println("----- FROM : ",dirPath )
 	fmt.Println("----- TO :" ,destPath )
+
+
+
+	return
 
 	//CHECK PARAMETERS
 	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
